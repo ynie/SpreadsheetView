@@ -339,6 +339,7 @@ public class SpreadsheetView: UIView {
     var currentTouch: UITouch?
 
     private var needsReload = true
+    internal var prevLayoutBounds: CGRect = .zero
 
     public override init(frame: CGRect) {
         super.init(frame: frame)
@@ -419,37 +420,44 @@ public class SpreadsheetView: UIView {
     }
 
     public func reloadData() {
+        self.reloadData(with: true)
+    }
+    
+    internal func reloadData(with needsLayout: Bool) {
         layoutProperties = resetLayoutProperties()
         circularScrollScalingFactor = determineCircularScrollScalingFactor()
         centerOffset = calculateCenterOffset()
-
+        
         cornerView.layoutAttributes = layoutAttributeForCornerView()
         columnHeaderView.layoutAttributes = layoutAttributeForColumnHeaderView()
         rowHeaderView.layoutAttributes = layoutAttributeForRowHeaderView()
         tableView.layoutAttributes = layoutAttributeForTableView()
-
+        
         cornerView.resetReusableObjects()
         columnHeaderView.resetReusableObjects()
         rowHeaderView.resetReusableObjects()
         tableView.resetReusableObjects()
-
+        
         resetContentSize(of: cornerView)
         resetContentSize(of: columnHeaderView)
         resetContentSize(of: rowHeaderView)
         resetContentSize(of: tableView)
-
+        
         resetScrollViewFrame()
         resetScrollViewArrangement()
-
+        
         if circularScrollingOptions.direction.contains(.horizontally) && tableView.contentOffset.x == 0 {
             scrollToHorizontalCenter()
         }
         if circularScrollingOptions.direction.contains(.vertically) && tableView.contentOffset.y == 0 {
             scrollToVerticalCenter()
         }
-
+        
         needsReload = false
-        setNeedsLayout()
+        
+        if needsLayout {
+            self.setNeedsLayout()
+        }
     }
 
     func reloadDataIfNeeded() {

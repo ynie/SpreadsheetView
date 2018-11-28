@@ -49,7 +49,10 @@ extension SpreadsheetView {
             cornerView.delegate = self
         }
 
-        reloadDataIfNeeded()
+        if self.prevLayoutBounds != self.bounds {
+            self.reloadData(with: false)
+            self.prevLayoutBounds = self.bounds
+        }
 
         guard numberOfColumns > 0 && numberOfRows > 0 else {
             return
